@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HexAsset.Models
+namespace HexAsset.Models.Dto
 {
-	public class AuditRequest
+	public class AuditRequestDto
 	{
-		[Key]
-		public int AuditId { get; set; }
+		[Required(ErrorMessage ="User Id is required")]
 		public int UserId { get; set; }
+		[Required(ErrorMessage = "User Id is status")]
 		public required string AuditStatus { get; set; }
 		public DateTime AuditDate { get; set; } = DateTime.UtcNow;
-
-		public User? User { get; set; }
 	}
 }

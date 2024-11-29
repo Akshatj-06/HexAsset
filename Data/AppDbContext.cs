@@ -53,13 +53,6 @@ namespace HexAsset.Data
 				.WithMany(u => u.AssetRequests)
 				.HasForeignKey(s => s.UserId);
 
-			// One-to-Many: AuditRequest -> Admin (User)
-			modelBuilder.Entity<AuditRequest>()
-				.HasOne(a => a.Admin)
-				.WithMany()
-				.HasForeignKey(a => a.AdminId)
-				.OnDelete(DeleteBehavior.Restrict);
-
 			// One-to-Many: AuditRequest -> User
 			modelBuilder.Entity<AuditRequest>()
 				.HasOne(a => a.User)

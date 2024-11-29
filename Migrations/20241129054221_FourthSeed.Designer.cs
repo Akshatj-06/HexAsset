@@ -4,6 +4,7 @@ using HexAsset.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HexAsset.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241129054221_FourthSeed")]
+    partial class FourthSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,6 +135,9 @@ namespace HexAsset.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuditId"));
 
+                    b.Property<int?>("AdminUserId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("AuditDate")
                         .HasColumnType("datetime2");
 
@@ -143,6 +149,8 @@ namespace HexAsset.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("AuditId");
+
+                    b.HasIndex("AdminUserId");
 
                     b.HasIndex("UserId");
 
@@ -263,11 +271,17 @@ namespace HexAsset.Migrations
 
             modelBuilder.Entity("HexAsset.Models.AuditRequest", b =>
                 {
+                    b.HasOne("HexAsset.Models.User", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminUserId");
+
                     b.HasOne("HexAsset.Models.User", "User")
                         .WithMany("AuditRequests")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Admin");
 
                     b.Navigation("User");
                 });

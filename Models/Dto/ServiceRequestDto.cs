@@ -1,19 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HexAsset.Models
+namespace HexAsset.Models.Dto
 {
-	public class AssetRequest
+	public class ServiceRequestDto
 	{
-		[Key]
-		public int AssetRequestId { get; set; }
+		[Required(ErrorMessage= "Asset Id is required")]
 		public int AssetId { get; set; }
+		[Required(ErrorMessage = "User Id is required")]
 		public int UserId { get; set; }
+		public string? Description { get; set; }
 		public string? IssueType { get; set; }
+		[Required(ErrorMessage = "Please update status")]
 		public required string RequestStatus { get; set; }
 		public DateTime RequestDate { get; set; } = DateTime.UtcNow;
-
-
-		public Asset? Asset { get; set; }
-		public User? User { get; set; }
 	}
 }
