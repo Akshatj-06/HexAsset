@@ -19,7 +19,7 @@ namespace HexAsset.Controllers
 
 
 		[HttpGet]
-		public IActionResult GetAllAssets()
+		public async Task <IActionResult> GetAllAssets()
 		{
 			try
 			{
