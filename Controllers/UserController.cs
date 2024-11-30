@@ -31,7 +31,7 @@ namespace HexAsset.Controllers
 			try
 			{
 				var users = await dbContext.Users.ToListAsync();
-				return Ok(dbContext.AssetAllocations.ToList());
+				return Ok(dbContext.Users.ToList());
 			}
 			catch (Exception ex)
 			{
@@ -46,7 +46,7 @@ namespace HexAsset.Controllers
 		{
 			try
 			{
-				if (await dbContext.Users.AnyAsync(u => u.Role == userdto.Role))
+				if (await dbContext.Users.AnyAsync(u => u.Name == userdto.Name))
 				{
 					return Conflict("Username already exists.");
 				}
