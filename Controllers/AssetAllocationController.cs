@@ -4,6 +4,7 @@ using HexAsset.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HexAsset.Controllers
 {
@@ -21,8 +22,16 @@ namespace HexAsset.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetAllAssetAllocations()
 		{
-			await dbContext.SaveChangesAsync();
-			return Ok(dbContext.AssetAllocations.ToList());
+			try
+			{
+				var assetAllocations= await dbContext.AssetAllocations.ToListAsync();
+				return Ok(dbContext.AssetAllocations.ToList());
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 
@@ -32,7 +41,7 @@ namespace HexAsset.Controllers
 			var assetAllocation = dbContext.AssetAllocations.Find(id);
 			if (assetAllocation == null)
 			{
-				return NotFound();
+				return NotFound($"AssetAllocation with ID {id} not found.");
 			}
 			await dbContext.SaveChangesAsync();
 			return Ok(assetAllocation);
@@ -41,50 +50,76 @@ namespace HexAsset.Controllers
 		[HttpPost]
 		public async Task<IActionResult> AddAssetAllocation(AssetAllocationDto assetAllocationDto)
 		{
-			var newAssetAllocation = new AssetAllocation
+			try 
 			{
-				AssetId = assetAllocationDto.AssetId,
-				UserId	= assetAllocationDto.UserId,
-				AllocationDate = assetAllocationDto.AllocationDate,
-				ReturnDate = assetAllocationDto.ReturnDate,
-				AllocationStatus = assetAllocationDto.AllocationStatus,
-			};
-			dbContext.AssetAllocations.Add(newAssetAllocation);
-			await dbContext.SaveChangesAsync();
+				var newAssetAllocation = new AssetAllocation
+				{
+					AssetId = assetAllocationDto.AssetId,
+					UserId = assetAllocationDto.UserId,
+					AllocationDate = assetAllocationDto.AllocationDate,
+					ReturnDate = assetAllocationDto.ReturnDate,
+					AllocationStatus = assetAllocationDto.AllocationStatus,
+				};
+				dbContext.AssetAllocations.Add(newAssetAllocation);
+				await dbContext.SaveChangesAsync();
 
-			return Ok(newAssetAllocation);
+				return Ok(newAssetAllocation);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 
 		[HttpPut("{id}")]
 		public async Task<IActionResult> UpdateAssetAllocationById(int id, AssetAllocationDto assetAllocationDto)
 		{
-			var assetAllocation = dbContext.AssetAllocations.Find(id);
-			if (assetAllocation == null) { return NotFound(); }
+			try
+			{
+				var assetAllocation = dbContext.AssetAllocations.Find(id);
+				if (assetAllocation == null)
+				{ 
+					return NotFound($"AssetAllocation with ID {id} not found."); 
+				}
 
-			assetAllocation.AssetId = assetAllocationDto.AssetId;
-			assetAllocation.UserId = assetAllocationDto.UserId;
-			assetAllocation.AllocationDate = assetAllocationDto.AllocationDate;
-			assetAllocation.ReturnDate = assetAllocationDto.ReturnDate;
-			assetAllocation.AllocationStatus = assetAllocationDto.AllocationStatus;
+				assetAllocation.AssetId = assetAllocationDto.AssetId;
+				assetAllocation.UserId = assetAllocationDto.UserId;
+				assetAllocation.AllocationDate = assetAllocationDto.AllocationDate;
+				assetAllocation.ReturnDate = assetAllocationDto.ReturnDate;
+				assetAllocation.AllocationStatus = assetAllocationDto.AllocationStatus;
 
 
-			dbContext.AssetAllocations.Update(assetAllocation);
-			await dbContext.SaveChangesAsync();
-			return Ok(assetAllocation);
+				dbContext.AssetAllocations.Update(assetAllocation);
+				await dbContext.SaveChangesAsync();
+				return Ok(assetAllocation);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteAssetAllocationById(int id)
 		{
-			var assetAllocation = dbContext.AssetAllocations.Find(id);
-			if (assetAllocation == null)
+			try
 			{
-				return NotFound();
+				var assetAllocation = dbContext.AssetAllocations.Find(id);
+				if (assetAllocation == null)
+				{
+					return NotFound($"AssetAllocation with ID {id} not found.");
+				}
+				dbContext.AssetAllocations.Remove(assetAllocation);
+				await dbContext.SaveChangesAsync();
+				return Ok(assetAllocation);
 			}
-			dbContext.AssetAllocations.Remove(assetAllocation);
-			await dbContext.SaveChangesAsync();
-			return Ok(assetAllocation);
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
 		}
 	}
 }

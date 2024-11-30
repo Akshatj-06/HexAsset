@@ -3,6 +3,7 @@ using HexAsset.Models.Dto;
 using HexAsset.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HexAsset.Controllers
 {
@@ -18,72 +19,115 @@ namespace HexAsset.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetAllServiceRequests()
 		{
-			await dbContext.SaveChangesAsync();
-			return Ok(dbContext.ServiceRequests.ToList());
+			try
+			{
+				var serviceRequests = await dbContext.ServiceRequests.ToListAsync();
+				return Ok(dbContext.ServiceRequests.ToList());
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetServiceRequestById(int id)
 		{
-			var serviceRequest = dbContext.ServiceRequests.Find(id);
-			if (serviceRequest == null)
+			try
 			{
-				return NotFound();
+				var serviceRequest = dbContext.ServiceRequests.Find(id);
+				if (serviceRequest == null)
+				{
+					return NotFound($"Service request with ID {id} not found.");
+				}
+				await dbContext.SaveChangesAsync();
+				return Ok(serviceRequest);
 			}
-			await dbContext.SaveChangesAsync();
-			return Ok(serviceRequest);
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> AddAsset(ServiceRequestDto serviceRequestDto)
 		{
-			var newServiceRequest = new ServiceRequest
+			try
 			{
-				AssetId=serviceRequestDto.AssetId,
-				UserId=serviceRequestDto.UserId,
-				Description=serviceRequestDto.Description,
-				IssueType=serviceRequestDto.IssueType,
-				RequestStatus=serviceRequestDto.RequestStatus,
-				RequestDate=serviceRequestDto.RequestDate
+				var newServiceRequest = new ServiceRequest
+				{
+					AssetId = serviceRequestDto.AssetId,
+					UserId = serviceRequestDto.UserId,
+					Description = serviceRequestDto.Description,
+					IssueType = serviceRequestDto.IssueType,
+					RequestStatus = serviceRequestDto.RequestStatus,
+					RequestDate = serviceRequestDto.RequestDate
 
-			};
-			dbContext.ServiceRequests.Add(newServiceRequest);
-			await dbContext.SaveChangesAsync();
+				};
+				dbContext.ServiceRequests.Add(newServiceRequest);
+				await dbContext.SaveChangesAsync();
 
-			return Ok(newServiceRequest);
+				return Ok(newServiceRequest);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 
 		[HttpPut("{id}")]
 		public async Task<IActionResult> UpdateServiceRequestById(int id, ServiceRequestDto serviceRequestDto)
 		{
-			var serviceRequest = dbContext.ServiceRequests.Find(id);
-			if (serviceRequest == null) { return NotFound(); }
+			try
+			{
+				var serviceRequest = dbContext.ServiceRequests.Find(id);
+				if (serviceRequest == null)
+				{
+					return NotFound($"Service request with ID {id} not found."); 
+				}
 
-			serviceRequest.AssetId = serviceRequestDto.AssetId;
-			serviceRequest.UserId = serviceRequestDto.UserId;
-			serviceRequest.Description = serviceRequestDto.Description;
-			serviceRequest.IssueType = serviceRequestDto.IssueType;
-			serviceRequest.RequestStatus = serviceRequestDto.RequestStatus;
-			serviceRequest.RequestDate = serviceRequestDto.RequestDate;
+				serviceRequest.AssetId = serviceRequestDto.AssetId;
+				serviceRequest.UserId = serviceRequestDto.UserId;
+				serviceRequest.Description = serviceRequestDto.Description;
+				serviceRequest.IssueType = serviceRequestDto.IssueType;
+				serviceRequest.RequestStatus = serviceRequestDto.RequestStatus;
+				serviceRequest.RequestDate = serviceRequestDto.RequestDate;
 
-			dbContext.ServiceRequests.Update(serviceRequest);
-			await dbContext.SaveChangesAsync();
-			return Ok(serviceRequest);
+				dbContext.ServiceRequests.Update(serviceRequest);
+				await dbContext.SaveChangesAsync();
+				return Ok(serviceRequest);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteServiceRequestById(int id)
 		{
-			var serviceRequest = dbContext.ServiceRequests.Find(id);
-			if (serviceRequest == null)
+			try
 			{
-				return NotFound();
+				var serviceRequest = dbContext.ServiceRequests.Find(id);
+				if (serviceRequest == null)
+				{
+					return NotFound($"Service request with ID {id} not found.");
+				}
+				dbContext.ServiceRequests.Remove(serviceRequest);
+				await dbContext.SaveChangesAsync();
+				return Ok(serviceRequest);
 			}
-			dbContext.ServiceRequests.Remove(serviceRequest);
-			await dbContext.SaveChangesAsync();
-			return Ok(serviceRequest);
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 	}
 }

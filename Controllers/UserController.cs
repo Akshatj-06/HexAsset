@@ -28,117 +28,178 @@ namespace HexAsset.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetAllUsers()
 		{
-			await dbContext.SaveChangesAsync();
-			return Ok(dbContext.AssetAllocations.ToList());
+			try
+			{
+				var users = await dbContext.Users.ToListAsync();
+				return Ok(dbContext.AssetAllocations.ToList());
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 
 		[HttpPost("Register")]
 		public async Task<IActionResult> Register([FromBody] UserDto userdto)
 		{
-			if (await dbContext.Users.AnyAsync(u => u.Role == userdto.Role))
+			try
 			{
-				return Conflict("Username already exists.");
+				if (await dbContext.Users.AnyAsync(u => u.Role == userdto.Role))
+				{
+					return Conflict("Username already exists.");
+				}
+
+				var user = new User
+				{
+					Role = userdto.Role,
+					Name = userdto.Name,
+					Email = userdto.Email,
+					Password = BCrypt.Net.BCrypt.HashPassword(userdto.Password),
+					ContactNumber = userdto.ContactNumber,
+					Address = userdto.Address,
+					DateCreated = userdto.DateCreated,
+				};
+
+				dbContext.Users.Add(user);
+				await dbContext.SaveChangesAsync();
+				return Ok("User registered successfully.");
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
 			}
 
-			var user = new User
-			{
-				Role = userdto.Role,
-				Name = userdto.Name,
-				Email = userdto.Email,
-				Password = BCrypt.Net.BCrypt.HashPassword(userdto.Password),
-				ContactNumber = userdto.ContactNumber,
-				Address = userdto.Address,
-				DateCreated = userdto.DateCreated,
-			};
-
-			dbContext.Users.Add(user);
-			await dbContext.SaveChangesAsync();
-			return Ok("User registered successfully.");
 		}
 
 		[HttpPost("login")]
 		public async Task<IActionResult> Login([FromBody] LoginDto userlogin)
 		{
-			var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == userlogin.Email);
-			if (user == null || !BCrypt.Net.BCrypt.Verify(userlogin.Password, user.Password))
+			try
 			{
-				return Unauthorized("Invalid username or password.");
-			}
+				if (userlogin == null || string.IsNullOrEmpty(userlogin.Email) || string.IsNullOrEmpty(userlogin.Password))
+				{
+					return BadRequest("Email or Password cannot be empty.");
+				}
 
-			var token = GenerateJwtToken(user);
-			return Ok(new { Token = token });
+				var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == userlogin.Email);
+				if (user == null || !BCrypt.Net.BCrypt.Verify(userlogin.Password, user.Password))
+				{
+					return Unauthorized("Invalid username or password.");
+				}
+
+				var token = GenerateJwtToken(user);
+				return Ok(new { Token = token });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"An error occurred while processing your request: {ex.Message}");
+			}
 		}
+
 		private string GenerateJwtToken(User user)
 		{
-			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-			var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-			var claims = new[]
+			try
 			{
+				var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+				var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+				var claims = new[]
+				{
 			new Claim(JwtRegisteredClaimNames.Sub, user.Email),
 			new Claim("role", user.Role),
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 		};
 
-			var token = new JwtSecurityToken(
-				_config["Jwt:Issuer"],
-				_config["Jwt:Audience"],
-				claims,
-				expires: DateTime.Now.AddMinutes(30),
-				signingCredentials: credentials);
+				var token = new JwtSecurityToken(
+					_config["Jwt:Issuer"],
+					_config["Jwt:Audience"],
+					claims,
+					expires: DateTime.Now.AddMinutes(30),
+					signingCredentials: credentials);
 
-			return new JwtSecurityTokenHandler().WriteToken(token);
+				return new JwtSecurityTokenHandler().WriteToken(token);
+			}
+			catch (Exception ex)
+			{
+				throw new InvalidOperationException("Error generating the JWT token.", ex);
+			}
 		}
+
 
 
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetUserById(int id)
 		{
-			var user = dbContext.Users.Find(id);
-			if (user == null)
+			try
 			{
-				return NotFound();
+				var user = dbContext.Users.Find(id);
+				if (user == null)
+				{
+					return NotFound($"User with ID {id} not found.");
+				}
+				await dbContext.SaveChangesAsync();
+				return Ok(user);
 			}
-			await dbContext.SaveChangesAsync();
-			return Ok(user);
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 
 		[HttpPut("{id}")]
 		public async Task<IActionResult> UpdateUserById(int id, [FromBody] UserDto userDto)
 		{
-			var user = dbContext.Users.Find(id);
-			if (user == null)
-				return NotFound();
+			try
+			{
+				var user = dbContext.Users.Find(id);
+				if (user == null)
+					return NotFound($"User with ID {id} not found.");
 
-			user.Role = userDto.Role;
-			user.Name = userDto.Name;
-			user.Email = userDto.Email;
-			user.ContactNumber = userDto.ContactNumber;
-			user.Address = userDto.Address;
+				user.Role = userDto.Role;
+				user.Name = userDto.Name;
+				user.Email = userDto.Email;
+				user.ContactNumber = userDto.ContactNumber;
+				user.Address = userDto.Address;
 
-			if (!string.IsNullOrWhiteSpace(userDto.Password))
-				user.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+				if (!string.IsNullOrWhiteSpace(userDto.Password))
+					user.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
 
-			dbContext.Users.Update(user);
-			await dbContext.SaveChangesAsync();
+				dbContext.Users.Update(user);
+				await dbContext.SaveChangesAsync();
 
-			return Ok(new { message = "User updated successfully!" });
+				return Ok(new { message = "User updated successfully!" });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteUserById(int id)
 		{
-			var user = dbContext.Users.Find(id);
-			if (user == null)
-				return NotFound();
+			try
+			{
+				var user = dbContext.Users.Find(id);
+				if (user == null)
+					return NotFound($"User with ID {id} not found.");
 
-			dbContext.Users.Remove(user);
-			await dbContext.SaveChangesAsync();
+				dbContext.Users.Remove(user);
+				await dbContext.SaveChangesAsync();
 
-			return Ok(new { message = "User deleted successfully!" });
+				return Ok(new { message = "User deleted successfully!" });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 	}
 }

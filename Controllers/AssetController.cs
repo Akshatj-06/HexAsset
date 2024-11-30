@@ -3,6 +3,7 @@ using HexAsset.Models;
 using HexAsset.Models.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HexAsset.Controllers
 {
@@ -18,78 +19,120 @@ namespace HexAsset.Controllers
 
 
 		[HttpGet]
-		public async Task<IActionResult> GetAllAssets()
+		public IActionResult GetAllAssets()
 		{
-			await dbContext.SaveChangesAsync();
-			return Ok(dbContext.Assets.ToList());
+			try
+			{
+				var assets = dbContext.Assets.ToList();
+				return Ok(assets);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
 		}
 
 
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetAssetById(int id)
 		{
-			var asset = dbContext.Assets.Find(id);
-			if (asset == null)
+			try
 			{
-				return NotFound();
+				var asset = dbContext.Assets.Find(id);
+				if (asset == null)
+				{
+					return NotFound($"Asset with ID {id} not found.");
+				}
+				await dbContext.SaveChangesAsync();
+				return Ok(asset);
 			}
-			await dbContext.SaveChangesAsync();
-			return Ok(asset);
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 
 		[HttpPost]
 		public async Task<IActionResult> AddAsset(AssetDto assetDto)
 		{
-			var newAsset = new Asset
+			try
 			{
-				AssetName = assetDto.AssetName,
-				AssetCategory = assetDto.AssetCategory,
-				AssetModel = assetDto.AssetModel,
-				ManufacturingDate = assetDto.ManufacturingDate,
-				ExpiryDate = assetDto.ExpiryDate,
-				AssetValue = assetDto.AssetValue,
-				CurrentStatus = assetDto.CurrentStatus
-			};
-			dbContext.Assets.Add(newAsset);
-			await dbContext.SaveChangesAsync();
+				var newAsset = new Asset
+				{
+					AssetName = assetDto.AssetName,
+					AssetCategory = assetDto.AssetCategory,
+					AssetModel = assetDto.AssetModel,
+					ManufacturingDate = assetDto.ManufacturingDate,
+					ExpiryDate = assetDto.ExpiryDate,
+					AssetValue = assetDto.AssetValue,
+					CurrentStatus = assetDto.CurrentStatus
+				};
+				dbContext.Assets.Add(newAsset);
+				await dbContext.SaveChangesAsync();
 
-			return Ok(newAsset);
+				return Ok(newAsset);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 
 		[HttpPut("{id}")]
 		public async Task<IActionResult> UpdateAssetById(int id, AssetDto assetDto)
 		{
-			var asset = dbContext.Assets.Find(id);
-			if (asset == null) { return NotFound(); }
+			try
+			{
+				var asset = dbContext.Assets.Find(id);
+				if (asset == null) 
+				{
+					return NotFound($"Asset with ID {id} not found."); 
+				}
 
-			asset.AssetName = assetDto.AssetName;
-			asset.AssetCategory = assetDto.AssetCategory;
-			asset.AssetModel = assetDto.AssetModel;
-			asset.ManufacturingDate = assetDto.ManufacturingDate;
-			asset.ExpiryDate = assetDto.ExpiryDate;
-			asset.AssetValue = assetDto.AssetValue;
-			asset.CurrentStatus = assetDto.CurrentStatus;
+				asset.AssetName = assetDto.AssetName;
+				asset.AssetCategory = assetDto.AssetCategory;
+				asset.AssetModel = assetDto.AssetModel;
+				asset.ManufacturingDate = assetDto.ManufacturingDate;
+				asset.ExpiryDate = assetDto.ExpiryDate;
+				asset.AssetValue = assetDto.AssetValue;
+				asset.CurrentStatus = assetDto.CurrentStatus;
 
 
-			dbContext.Assets.Update(asset);
-			await dbContext.SaveChangesAsync();
-			return Ok(asset);
+				dbContext.Assets.Update(asset);
+				await dbContext.SaveChangesAsync();
+				return Ok(asset);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+			
 		}
 
 
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteAssetById(int id)
 		{
-			var asset = dbContext.Assets.Find(id);
-			if (asset == null)
+			try
 			{
-				return NotFound();
+				var asset = dbContext.Assets.Find(id);
+				if (asset == null)
+				{
+					return NotFound($"Asset with ID {id} not found.");
+				}
+				dbContext.Assets.Remove(asset);
+				await dbContext.SaveChangesAsync();
+				return Ok(asset);
 			}
-			dbContext.Assets.Remove(asset);
-			await dbContext.SaveChangesAsync();
-			return Ok(asset);
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 	}
 }

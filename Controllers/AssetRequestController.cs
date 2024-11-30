@@ -3,6 +3,7 @@ using HexAsset.Models.Dto;
 using HexAsset.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HexAsset.Controllers
 {
@@ -18,68 +19,111 @@ namespace HexAsset.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetAllAssetRequests()
 		{
-			await dbContext.SaveChangesAsync();
-			return Ok(dbContext.AssetRequests.ToList());
+			try
+			{
+				var assetRequests= await dbContext.AssetRequests.ToListAsync();
+				return Ok(dbContext.AssetRequests.ToList());
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetAssetRequestById(int id)
 		{
-			var assetRequest = dbContext.ServiceRequests.Find(id);
-			if (assetRequest == null)
+			try
 			{
-				return NotFound();
+				var assetRequest = dbContext.ServiceRequests.Find(id);
+				if (assetRequest == null)
+				{
+					return NotFound($"Asset request with ID {id} not found.");
+				}
+				await dbContext.SaveChangesAsync();
+				return Ok(assetRequest);
 			}
-			await dbContext.SaveChangesAsync();
-			return Ok(assetRequest);
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> AddAsset(AssetRequestDto assetRequestDto)
 		{
-			var newAssetRequest = new AssetRequest
+			try
 			{
-				AssetId = assetRequestDto.AssetId,
-				UserId = assetRequestDto.UserId,
-				IssueType = assetRequestDto.IssueType,
-				RequestStatus = assetRequestDto.RequestStatus,
-				RequestDate = assetRequestDto.RequestDate
+				var newAssetRequest = new AssetRequest
+				{
+					AssetId = assetRequestDto.AssetId,
+					UserId = assetRequestDto.UserId,
+					IssueType = assetRequestDto.IssueType,
+					RequestStatus = assetRequestDto.RequestStatus,
+					RequestDate = assetRequestDto.RequestDate
 
-			};
-			dbContext.AssetRequests.Add(newAssetRequest);
-			await dbContext.SaveChangesAsync();
+				};
+				dbContext.AssetRequests.Add(newAssetRequest);
+				await dbContext.SaveChangesAsync();
 
-			return Ok(newAssetRequest);
+				return Ok(newAssetRequest);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 		[HttpPut("{id}")]
 		public async Task<IActionResult> UpdateAssetRequestById(int id, AssetRequestDto assetRequestDto)
 		{
-			var assetRequest = dbContext.AssetRequests.Find(id);
-			if (assetRequest == null) { return NotFound(); }
+			try
+			{
+				var assetRequest = dbContext.AssetRequests.Find(id);
+				if (assetRequest == null)
+				{ 
+					return NotFound($"Asset request with ID {id} not found."); 
+				}
 
-			assetRequest.AssetId = assetRequestDto.AssetId;
-			assetRequest.UserId = assetRequestDto.UserId;
-			assetRequest.IssueType = assetRequestDto.IssueType;
-			assetRequest.RequestStatus = assetRequestDto.RequestStatus;
-			assetRequest.RequestDate = assetRequestDto.RequestDate;
+				assetRequest.AssetId = assetRequestDto.AssetId;
+				assetRequest.UserId = assetRequestDto.UserId;
+				assetRequest.IssueType = assetRequestDto.IssueType;
+				assetRequest.RequestStatus = assetRequestDto.RequestStatus;
+				assetRequest.RequestDate = assetRequestDto.RequestDate;
 
-			dbContext.AssetRequests.Update(assetRequest);
-			await dbContext.SaveChangesAsync();
-			return Ok(assetRequest);
+				dbContext.AssetRequests.Update(assetRequest);
+				await dbContext.SaveChangesAsync();
+				return Ok(assetRequest);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteAssetRequestById(int id)
 		{
-			var assetRequest = dbContext.AssetRequests.Find(id);
-			if (assetRequest == null)
+			try
 			{
-				return NotFound();
+				var assetRequest = dbContext.AssetRequests.Find(id);
+				if (assetRequest == null)
+				{
+					return NotFound($"Asset request with ID {id} not found.");
+				}
+				dbContext.AssetRequests.Remove(assetRequest);
+				await dbContext.SaveChangesAsync();
+				return Ok(assetRequest);
 			}
-			dbContext.AssetRequests.Remove(assetRequest);
-			await dbContext.SaveChangesAsync();
-			return Ok(assetRequest);
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
 		}
 	}
 }
