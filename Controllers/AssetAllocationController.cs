@@ -18,8 +18,8 @@ namespace HexAsset.Controllers
 			this.dbContext = dbContext;
 		}
 
-		[Authorize(Roles ="Admin")]
 		[HttpGet]
+		[Route("GetAssetAllocation")]
 		public async Task<IActionResult> GetAllAssetAllocations()
 		{
 			try
@@ -35,7 +35,7 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpGet("{id}")]
+		[HttpGet("GetAssetAllocationById/{id}")]
 		public async Task<IActionResult> GetAssetAllocationById(int id)
 		{
 			var assetAllocation = dbContext.AssetAllocations.Find(id);
@@ -48,6 +48,8 @@ namespace HexAsset.Controllers
 		}
 
 		[HttpPost]
+		[Route("AddAssetAllocation")]
+
 		public async Task<IActionResult> AddAssetAllocation(AssetAllocationDto assetAllocationDto)
 		{
 			try 
@@ -73,7 +75,7 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpPut("{id}")]
+		[HttpPut("UpdateAssetAllocation/{id}")]
 		public async Task<IActionResult> UpdateAssetAllocationById(int id, AssetAllocationDto assetAllocationDto)
 		{
 			try
@@ -102,7 +104,7 @@ namespace HexAsset.Controllers
 
 		}
 
-		[HttpDelete("{id}")]
+		[HttpDelete("DeleteAssetAllocation/{id}")]
 		public async Task<IActionResult> DeleteAssetAllocationById(int id)
 		{
 			try

@@ -18,6 +18,7 @@ namespace HexAsset.Controllers
 		}
 
 		[HttpGet]
+		[Route("GetAuditRequest")]
 		public async Task<IActionResult> GetAllAuditRequests()
 		{
 			try
@@ -33,7 +34,7 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpGet("{id}")]
+		[HttpGet("GetAuditRequestById/{id}")]
 		public async Task<IActionResult> GetAuditRequestById(int id)
 		{
 			try
@@ -56,6 +57,7 @@ namespace HexAsset.Controllers
 
 
 		[HttpPost]
+		[Route("AddAuditRequest")]
 		public async Task<IActionResult> AddAuditRequest(AuditRequestDto auditassetRequestDto)
 		{
 			try
@@ -78,7 +80,7 @@ namespace HexAsset.Controllers
 
 		}
 
-		[HttpPut("{id}")]
+		[HttpPut("UpdateAuditRequest/{id}")]
 		public async Task<IActionResult> UpdateAuditRequestById(int id, AuditRequestDto auditRequestDto)
 		{
 			try
@@ -105,7 +107,7 @@ namespace HexAsset.Controllers
 
 		}
 
-		[HttpDelete("{id}")]
+		[HttpDelete("DeleteAuditRequest/{id}")]
 		public async Task<IActionResult> DeleteAuditRequestById(int id)
 		{
 			try

@@ -17,6 +17,7 @@ namespace HexAsset.Controllers
 			this.dbContext = dbContext;
 		}
 		[HttpGet]
+		[Route("GetServiceRequest")]
 		public async Task<IActionResult> GetAllServiceRequests()
 		{
 			try
@@ -31,7 +32,7 @@ namespace HexAsset.Controllers
 
 		}
 
-		[HttpGet("{id}")]
+		[HttpGet("GetServiceRequestById/{id}")]
 		public async Task<IActionResult> GetServiceRequestById(int id)
 		{
 			try
@@ -52,6 +53,7 @@ namespace HexAsset.Controllers
 		}
 
 		[HttpPost]
+		[Route("AddServiceRequest")]
 		public async Task<IActionResult> AddAsset(ServiceRequestDto serviceRequestDto)
 		{
 			try
@@ -79,7 +81,7 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpPut("{id}")]
+		[HttpPut("UpdateServiceRequest/{id}")]
 		public async Task<IActionResult> UpdateServiceRequestById(int id, ServiceRequestDto serviceRequestDto)
 		{
 			try
@@ -109,7 +111,7 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpDelete("{id}")]
+		[HttpDelete("DeleteServiceRequest/{id}")]
 		public async Task<IActionResult> DeleteServiceRequestById(int id)
 		{
 			try

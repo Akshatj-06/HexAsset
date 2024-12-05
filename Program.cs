@@ -31,6 +31,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 		};
 	});
 
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowAngularClient", policy =>
+	{
+		policy.WithOrigins("http://localhost:4200") // Specify your Angular app's URL
+			  .AllowAnyMethod()
+			  .AllowAnyHeader();
+	});
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -41,6 +51,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAngularClient");
 
 app.UseAuthentication();
 

@@ -15,7 +15,7 @@ namespace HexAsset.Models
 		public required string CurrentStatus { get; set; }
 
 
-		public ICollection<AssetAllocation>? Allocations { get; set; }
+		public ICollection<AssetAllocation>? AssetAllocations { get; set; }
 		public ICollection<ServiceRequest>? ServiceRequests { get; set; }
 		public ICollection<AssetRequest>? AssetRequests { get; set; }
 	}

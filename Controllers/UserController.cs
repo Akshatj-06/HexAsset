@@ -25,7 +25,7 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpGet]
+		[HttpGet("GetUser")]
 		public async Task<IActionResult> GetAllUsers()
 		{
 			try
@@ -129,7 +129,7 @@ namespace HexAsset.Controllers
 
 
 
-		[HttpGet("{id}")]
+		[HttpGet("GetUserById/{id}")]
 		public async Task<IActionResult> GetUserById(int id)
 		{
 			try
@@ -150,7 +150,7 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpPut("{id}")]
+		[HttpPut("UpdateUser/{id}")]
 		public async Task<IActionResult> UpdateUserById(int id, [FromBody] UserDto userDto)
 		{
 			try
@@ -181,7 +181,8 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpDelete("{id}")]
+		[HttpDelete("DeleteUser/{id}")]
+
 		public async Task<IActionResult> DeleteUserById(int id)
 		{
 			try

@@ -20,13 +20,13 @@ namespace HexAsset.Data
 			// One-to-Many: AssetAllocation -> Asset
 			modelBuilder.Entity<AssetAllocation>()
 				.HasOne(a => a.Asset)
-				.WithMany(b => b.Allocations)
+				.WithMany(b => b.AssetAllocations)
 				.HasForeignKey(a => a.AssetId);
 
 			// One-to-Many: AssetAllocation -> User
 			modelBuilder.Entity<AssetAllocation>()
 				.HasOne(a => a.User)
-				.WithMany(b => b.Allocations)
+				.WithMany(b => b.AssetAllocations)
 				.HasForeignKey(a => a.UserId);
 
 			// One-to-Many: ServiceRequest -> Asset

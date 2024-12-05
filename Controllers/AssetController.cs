@@ -19,6 +19,7 @@ namespace HexAsset.Controllers
 
 
 		[HttpGet]
+		[Route("GetAsset")]
 		public async Task <IActionResult> GetAllAssets()
 		{
 			try
@@ -33,7 +34,7 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpGet("{id}")]
+		[HttpGet("GetAssetById/{id}")]
 		public async Task<IActionResult> GetAssetById(int id)
 		{
 			try
@@ -55,6 +56,7 @@ namespace HexAsset.Controllers
 
 
 		[HttpPost]
+		[Route("AddAsset")]
 		public async Task<IActionResult> AddAsset(AssetDto assetDto)
 		{
 			try
@@ -82,7 +84,7 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpPut("{id}")]
+		[HttpPut("UpdateAsset/{id}")]
 		public async Task<IActionResult> UpdateAssetById(int id, AssetDto assetDto)
 		{
 			try
@@ -114,7 +116,7 @@ namespace HexAsset.Controllers
 		}
 
 
-		[HttpDelete("{id}")]
+		[HttpDelete("DeleteAsset/{id}")]
 		public async Task<IActionResult> DeleteAssetById(int id)
 		{
 			try
