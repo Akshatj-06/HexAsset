@@ -9,8 +9,6 @@ namespace HexAsset.Models
 		public required string AssetName { get; set; }
 		public string? AssetCategory { get; set; }
 		public string? AssetModel { get; set; }
-		public DateTime? ManufacturingDate { get; set; }
-		public DateTime? ExpiryDate { get; set; }
 		public int AssetValue { get; set; }
 		public required string CurrentStatus { get; set; }
 

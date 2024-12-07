@@ -9,7 +9,6 @@ namespace HexAsset.Models
 		public int AssetId { get; set; }
 		public int UserId { get; set; }
 		public string? Description { get; set; }
-		public string? IssueType { get; set; }
 		public required string RequestStatus { get; set; }
 		public DateTime RequestDate { get; set; } = DateTime.UtcNow;
 

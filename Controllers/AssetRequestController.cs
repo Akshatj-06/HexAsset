@@ -62,7 +62,6 @@ namespace HexAsset.Controllers
 				{
 					AssetId = assetRequestDto.AssetId,
 					UserId = assetRequestDto.UserId,
-					IssueType = assetRequestDto.IssueType,
 					RequestStatus = assetRequestDto.RequestStatus,
 					RequestDate = assetRequestDto.RequestDate
 
@@ -92,7 +91,6 @@ namespace HexAsset.Controllers
 
 				assetRequest.AssetId = assetRequestDto.AssetId;
 				assetRequest.UserId = assetRequestDto.UserId;
-				assetRequest.IssueType = assetRequestDto.IssueType;
 				assetRequest.RequestStatus = assetRequestDto.RequestStatus;
 				assetRequest.RequestDate = assetRequestDto.RequestDate;
 

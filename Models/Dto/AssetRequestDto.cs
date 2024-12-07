@@ -8,7 +8,6 @@ namespace HexAsset.Models.Dto
 		public int AssetId { get; set; }
 		[Required(ErrorMessage = "User Id is required")]
 		public int UserId { get; set; }
-		public string? IssueType { get; set; }
 		[Required(ErrorMessage = "Please update status")]
 		public required string RequestStatus { get; set; }
 		public DateTime RequestDate { get; set; } = DateTime.UtcNow;

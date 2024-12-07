@@ -63,7 +63,6 @@ namespace HexAsset.Controllers
 					AssetId = serviceRequestDto.AssetId,
 					UserId = serviceRequestDto.UserId,
 					Description = serviceRequestDto.Description,
-					IssueType = serviceRequestDto.IssueType,
 					RequestStatus = serviceRequestDto.RequestStatus,
 					RequestDate = serviceRequestDto.RequestDate
 
@@ -95,7 +94,6 @@ namespace HexAsset.Controllers
 				serviceRequest.AssetId = serviceRequestDto.AssetId;
 				serviceRequest.UserId = serviceRequestDto.UserId;
 				serviceRequest.Description = serviceRequestDto.Description;
-				serviceRequest.IssueType = serviceRequestDto.IssueType;
 				serviceRequest.RequestStatus = serviceRequestDto.RequestStatus;
 				serviceRequest.RequestDate = serviceRequestDto.RequestDate;
 

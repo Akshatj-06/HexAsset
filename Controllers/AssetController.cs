@@ -66,8 +66,6 @@ namespace HexAsset.Controllers
 					AssetName = assetDto.AssetName,
 					AssetCategory = assetDto.AssetCategory,
 					AssetModel = assetDto.AssetModel,
-					ManufacturingDate = assetDto.ManufacturingDate,
-					ExpiryDate = assetDto.ExpiryDate,
 					AssetValue = assetDto.AssetValue,
 					CurrentStatus = assetDto.CurrentStatus
 				};
@@ -98,8 +96,6 @@ namespace HexAsset.Controllers
 				asset.AssetName = assetDto.AssetName;
 				asset.AssetCategory = assetDto.AssetCategory;
 				asset.AssetModel = assetDto.AssetModel;
-				asset.ManufacturingDate = assetDto.ManufacturingDate;
-				asset.ExpiryDate = assetDto.ExpiryDate;
 				asset.AssetValue = assetDto.AssetValue;
 				asset.CurrentStatus = assetDto.CurrentStatus;
 
