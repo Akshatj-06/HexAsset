@@ -48,6 +48,7 @@ namespace HexAsset.Controllers
 		}
 
 		[HttpPost]
+		[Authorize(Roles = "Admin")]
 		[Route("AddAssetAllocation")]
 
 		public async Task<IActionResult> AddAssetAllocation(AssetAllocationDto assetAllocationDto)
@@ -74,7 +75,7 @@ namespace HexAsset.Controllers
 
 		}
 
-
+		[Authorize(Roles = "Admin")]
 		[HttpPut("UpdateAssetAllocation/{id}")]
 		public async Task<IActionResult> UpdateAssetAllocationById(int id, AssetAllocationDto assetAllocationDto)
 		{
@@ -103,7 +104,7 @@ namespace HexAsset.Controllers
 			}
 
 		}
-
+		[Authorize(Roles = "Admin")]
 		[HttpDelete("DeleteAssetAllocation/{id}")]
 		public async Task<IActionResult> DeleteAssetAllocationById(int id)
 		{

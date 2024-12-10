@@ -4,6 +4,7 @@ using HexAsset.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HexAsset.Controllers
 {
@@ -79,7 +80,7 @@ namespace HexAsset.Controllers
 
 		}
 
-
+		[Authorize(Roles = "Employee")]
 		[HttpPut("UpdateServiceRequest/{id}")]
 		public async Task<IActionResult> UpdateServiceRequestById(int id, ServiceRequestDto serviceRequestDto)
 		{
@@ -108,7 +109,7 @@ namespace HexAsset.Controllers
 
 		}
 
-
+		[Authorize(Roles = "Employee")]
 		[HttpDelete("DeleteServiceRequest/{id}")]
 		public async Task<IActionResult> DeleteServiceRequestById(int id)
 		{

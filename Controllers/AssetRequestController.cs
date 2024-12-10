@@ -4,6 +4,7 @@ using HexAsset.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HexAsset.Controllers
 {
@@ -53,6 +54,7 @@ namespace HexAsset.Controllers
 		}
 
 		[HttpPost]
+		[Authorize(Roles = "Employee")]
 		[Route("AddAssetRequest")]
 		public async Task<IActionResult> AddAsset(AssetRequestDto assetRequestDto)
 		{
@@ -105,6 +107,7 @@ namespace HexAsset.Controllers
 
 		}
 
+		[Authorize(Roles = "Employee")]
 		[HttpDelete("DeleteAssetRequest/{id}")]
 		public async Task<IActionResult> DeleteAssetRequestById(int id)
 		{

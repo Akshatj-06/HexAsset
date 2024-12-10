@@ -4,6 +4,7 @@ using HexAsset.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HexAsset.Controllers
 {
@@ -57,6 +58,7 @@ namespace HexAsset.Controllers
 
 
 		[HttpPost]
+		[Authorize(Roles = "Admin")]
 		[Route("AddAuditRequest")]
 		public async Task<IActionResult> AddAuditRequest(AuditRequestDto auditassetRequestDto)
 		{
@@ -79,7 +81,7 @@ namespace HexAsset.Controllers
 			}
 
 		}
-
+		[Authorize(Roles = "Admin")]
 		[HttpPut("UpdateAuditRequest/{id}")]
 		public async Task<IActionResult> UpdateAuditRequestById(int id, AuditRequestDto auditRequestDto)
 		{
@@ -106,7 +108,7 @@ namespace HexAsset.Controllers
 			}
 
 		}
-
+		[Authorize(Roles = "Admin")]
 		[HttpDelete("DeleteAuditRequest/{id}")]
 		public async Task<IActionResult> DeleteAuditRequestById(int id)
 		{
