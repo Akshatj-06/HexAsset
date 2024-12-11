@@ -129,6 +129,36 @@ namespace HexAsset.Controllers
 			}
 		}
 
+		[HttpPost("ForgotPassword")]
+		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request)
+		{
+			try
+			{
+				if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.NewPassword))
+				{
+					return BadRequest("Email or new password is missing.");
+				}
+
+				var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+				if (user == null)
+				{
+					return NotFound("User with the specified email does not exist.");
+				}
+
+				user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+				dbContext.Users.Update(user);
+				await dbContext.SaveChangesAsync();
+
+				return Ok(new { message = "Password updated successfully!" });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+		}
+
+
 
 
 		[HttpGet("GetUserById/{id}")]
