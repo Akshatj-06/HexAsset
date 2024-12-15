@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HexAsset.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241206190830_EighthSeed")]
-    partial class EighthSeed
+    [Migration("20241211115255_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -1,133 +1,110 @@
-﻿using HexAsset.Data;
-using HexAsset.Models.Dto;
-using HexAsset.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using HexAsset.Models.Dto;
+using HexAsset.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace HexAsset.Controllers
 {
-	[Route("api/[controller]")]
-	[ApiController]
-	public class AuditRequestController : ControllerBase
-	{
-		private readonly AppDbContext dbContext;
-		public AuditRequestController(AppDbContext dbContext)
-		{
-			this.dbContext = dbContext;
-		}
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuditRequestController : ControllerBase
+    {
+        private readonly IAuditRequestRepository _auditRequestRepository;
 
-		[HttpGet]
-		[Route("GetAuditRequest")]
-		public async Task<IActionResult> GetAllAuditRequests()
-		{
-			try
-			{
-				var auditRequests= await dbContext.AuditRequests.ToListAsync();
-				return Ok(dbContext.AuditRequests.ToList());
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, $"Internal server error: {ex.Message}");
-			}
+        public AuditRequestController(IAuditRequestRepository auditRequestRepository)
+        {
+            _auditRequestRepository = auditRequestRepository;
+        }
 
-		}
+        [HttpGet]
+        [Route("GetAuditRequest")]
+        public async Task<IActionResult> GetAllAuditRequests()
+        {
+            try
+            {
+                var auditRequests = await _auditRequestRepository.GetAllAsync();
+                return Ok(auditRequests);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
+        [HttpGet("GetAuditRequestById/{id}")]
+        public async Task<IActionResult> GetAuditRequestById(int id)
+        {
+            try
+            {
+                var auditRequest = await _auditRequestRepository.GetByIdAsync(id);
+                if (auditRequest == null)
+                {
+                    return NotFound($"Audit request with ID {id} not found.");
+                }
 
-		[HttpGet("GetAuditRequestById/{id}")]
-		public async Task<IActionResult> GetAuditRequestById(int id)
-		{
-			try
-			{
-				var auditRequest = dbContext.AuditRequests.Find(id);
-				if (auditRequest == null)
-				{
-					return NotFound($"Audit request with ID {id} not found.");
-				}
-				await dbContext.SaveChangesAsync();
-				return Ok(auditRequest);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, $"Internal server error: {ex.Message}");
-			}
+                return Ok(auditRequest);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [Route("AddAuditRequest")]
+        public async Task<IActionResult> AddAuditRequest(AuditRequestDto auditRequestDto)
+        {
+            try
+            {
+                var newAuditRequest = await _auditRequestRepository.AddAsync(auditRequestDto);
+                return Ok(newAuditRequest);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
-		}
+        [HttpPut("UpdateAuditRequest/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateAuditRequestById(int id, AuditRequestDto auditRequestDto)
+        {
+            try
+            {
+                var updatedAuditRequest = await _auditRequestRepository.UpdateAsync(id, auditRequestDto);
+                if (updatedAuditRequest == null)
+                {
+                    return NotFound($"Audit request with ID {id} not found.");
+                }
 
+                return Ok(updatedAuditRequest);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
-		[HttpPost]
-		[Authorize(Roles = "Admin")]
-		[Route("AddAuditRequest")]
-		public async Task<IActionResult> AddAuditRequest(AuditRequestDto auditassetRequestDto)
-		{
-			try
-			{
-				var newAuditRequest = new AuditRequest
-				{
-					UserId = auditassetRequestDto.UserId,
-					AuditStatus = auditassetRequestDto.AuditStatus,
-					AuditDate = auditassetRequestDto.AuditDate,
-				};
-				dbContext.AuditRequests.Add(newAuditRequest);
-				await dbContext.SaveChangesAsync();
+        [HttpDelete("DeleteAuditRequest/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteAuditRequestById(int id)
+        {
+            try
+            {
+                var isDeleted = await _auditRequestRepository.DeleteAsync(id);
+                if (!isDeleted)
+                {
+                    return NotFound($"Audit request with ID {id} not found.");
+                }
 
-				return Ok(newAuditRequest);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, $"Internal server error: {ex.Message}");
-			}
-
-		}
-		[Authorize(Roles = "Admin")]
-		[HttpPut("UpdateAuditRequest/{id}")]
-		public async Task<IActionResult> UpdateAuditRequestById(int id, AuditRequestDto auditRequestDto)
-		{
-			try
-			{
-				var auditRequest = dbContext.AuditRequests.Find(id);
-				if (auditRequest == null) 
-				{ 
-					return NotFound($"Audit request with ID {id} not found.");
-				}
-
-				auditRequest.UserId = auditRequestDto.UserId;
-				auditRequest.AuditStatus = auditRequestDto.AuditStatus;
-				auditRequest.AuditDate = auditRequestDto.AuditDate;
-
-
-				dbContext.AuditRequests.Update(auditRequest);
-				await dbContext.SaveChangesAsync();
-				return Ok(auditRequest);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, $"Internal server error: {ex.Message}");
-			}
-
-		}
-		[Authorize(Roles = "Admin")]
-		[HttpDelete("DeleteAuditRequest/{id}")]
-		public async Task<IActionResult> DeleteAuditRequestById(int id)
-		{
-			try
-			{
-				var auditRequest = dbContext.AuditRequests.Find(id);
-				if (auditRequest == null)
-				{
-					return NotFound($"Audit request with ID {id} not found.");
-				}
-				dbContext.AuditRequests.Remove(auditRequest);
-				await dbContext.SaveChangesAsync();
-				return Ok(auditRequest);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, $"Internal server error: {ex.Message}");
-			}
-
-		}
-	}
+                return Ok($"Audit request with ID {id} deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+    }
 }
