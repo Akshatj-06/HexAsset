@@ -1,11 +1,10 @@
-﻿using HexAsset.Data;
-using HexAsset.Models;
-using HexAsset.Models.Dto;
+﻿using HexAsset.Models.Dto;
+using HexAsset.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using HexAsset.Repositories;
+using HexAsset.Models;
 
 namespace HexAsset.Controllers
 {
@@ -13,11 +12,11 @@ namespace HexAsset.Controllers
     [ApiController]
     public class AssetController : ControllerBase
     {
-        private readonly IAssetRepository _assetRepository;
+        private readonly IAssetService _assetService;
 
-        public AssetController(IAssetRepository assetRepository)
+        public AssetController(IAssetService assetService)
         {
-            _assetRepository = assetRepository;
+            _assetService = assetService;
         }
 
         [HttpGet("GetAsset")]
@@ -25,7 +24,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var assets = await _assetRepository.GetAllAssetsAsync();
+                var assets = await _assetService.GetAllAssetsAsync();
                 return Ok(assets);
             }
             catch (Exception ex)
@@ -39,7 +38,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var asset = await _assetRepository.GetAssetByIdAsync(id);
+                var asset = await _assetService.GetAssetByIdAsync(id);
                 if (asset == null)
                 {
                     return NotFound($"Asset with ID {id} not found.");
@@ -53,7 +52,6 @@ namespace HexAsset.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         [Route("AddAsset")]
         public async Task<IActionResult> AddAsset(AssetDto assetDto)
         {
@@ -68,8 +66,12 @@ namespace HexAsset.Controllers
                     CurrentStatus = assetDto.CurrentStatus
                 };
 
-                var addedAsset = await _assetRepository.AddAssetAsync(newAsset);
+                var addedAsset = await _assetService.AddAssetAsync(newAsset);
                 return Ok(addedAsset);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
@@ -92,13 +94,16 @@ namespace HexAsset.Controllers
                     CurrentStatus = assetDto.CurrentStatus
                 };
 
-                var asset = await _assetRepository.UpdateAssetAsync(id, updatedAsset);
-                if (asset == null)
-                {
-                    return NotFound($"Asset with ID {id} not found.");
-                }
-
+                var asset = await _assetService.UpdateAssetAsync(id, updatedAsset);
                 return Ok(asset);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
@@ -112,13 +117,12 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var deleted = await _assetRepository.DeleteAssetAsync(id);
-                if (!deleted)
-                {
-                    return NotFound($"Asset with ID {id} not found.");
-                }
-
+                var deleted = await _assetService.DeleteAssetAsync(id);
                 return Ok($"Asset with ID {id} has been deleted.");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {

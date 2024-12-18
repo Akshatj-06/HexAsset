@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using HexAsset.Repositories;
+using HexAsset.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +18,18 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IAssetService, AssetService>();
+builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<IAssetRequestServices, AssetRequestService>();
+builder.Services.AddScoped<IAssetAllocationService, AssetAllocationService>();
+builder.Services.AddScoped<IServiceRequestService, ServiceRequestService>();
+
+// Register repositories
 builder.Services.AddScoped<IAssetRepository, AssetRepository>();
-builder.Services.AddScoped<IUserRepository,UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>(); 
 builder.Services.AddScoped<IAssetRequestRepository, AssetRequestRepository>();
 builder.Services.AddScoped<IAssetAllocationRepository, AssetAllocationRepository>();
 builder.Services.AddScoped<IServiceRequestRepository, ServiceRequestRepository>();
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 	.AddJwtBearer(options =>

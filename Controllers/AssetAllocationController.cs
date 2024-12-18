@@ -1,23 +1,20 @@
-﻿using HexAsset.Data;
-using HexAsset.Models;
+﻿using HexAsset.Models;
 using HexAsset.Models.Dto;
-using HexAsset.Repositories;
+using HexAsset.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HexAsset.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AssetAllocationController : ControllerBase
     {
-        private readonly IAssetAllocationRepository repository;
+        private readonly IAssetAllocationService _assetAllocationService;
 
-        public AssetAllocationController(IAssetAllocationRepository repository)
+        public AssetAllocationController(IAssetAllocationService assetAllocationService)
         {
-            this.repository = repository;
+            _assetAllocationService = assetAllocationService;
         }
 
         [HttpGet]
@@ -26,7 +23,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var assetAllocations = await repository.GetAllAssetAllocationsAsync();
+                var assetAllocations = await _assetAllocationService.GetAllAssetAllocationsAsync();
                 return Ok(assetAllocations);
             }
             catch (Exception ex)
@@ -38,7 +35,7 @@ namespace HexAsset.Controllers
         [HttpGet("GetAssetAllocationById/{id}")]
         public async Task<IActionResult> GetAssetAllocationById(int id)
         {
-            var assetAllocation = await repository.GetAssetAllocationByIdAsync(id);
+            var assetAllocation = await _assetAllocationService.GetAssetAllocationByIdAsync(id);
             if (assetAllocation == null)
             {
                 return NotFound($"AssetAllocation with ID {id} not found.");
@@ -62,7 +59,7 @@ namespace HexAsset.Controllers
                     AllocationStatus = assetAllocationDto.AllocationStatus,
                 };
 
-                var addedAssetAllocation = await repository.AddAssetAllocationAsync(newAssetAllocation);
+                var addedAssetAllocation = await _assetAllocationService.AddAssetAllocationAsync(newAssetAllocation);
                 return Ok(addedAssetAllocation);
             }
             catch (Exception ex)
@@ -86,7 +83,7 @@ namespace HexAsset.Controllers
                     AllocationStatus = assetAllocationDto.AllocationStatus,
                 };
 
-                var result = await repository.UpdateAssetAllocationAsync(id, updatedAssetAllocation);
+                var result = await _assetAllocationService.UpdateAssetAllocationAsync(id, updatedAssetAllocation);
                 if (result == null)
                 {
                     return NotFound($"AssetAllocation with ID {id} not found.");
@@ -105,7 +102,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var isDeleted = await repository.DeleteAssetAllocationAsync(id);
+                var isDeleted = await _assetAllocationService.DeleteAssetAllocationAsync(id);
                 if (!isDeleted)
                 {
                     return NotFound($"AssetAllocation with ID {id} not found.");
@@ -118,5 +115,4 @@ namespace HexAsset.Controllers
             }
         }
     }
-    
 }

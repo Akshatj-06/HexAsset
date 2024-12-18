@@ -1,6 +1,6 @@
 ﻿using HexAsset.Models;
 using HexAsset.Models.Dto;
-using HexAsset.Repositories;
+using HexAsset.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,20 +10,19 @@ namespace HexAsset.Controllers
     [ApiController]
     public class AssetRequestController : ControllerBase
     {
-        private readonly IAssetRequestRepository _assetRequestRepository;
+        private readonly IAssetRequestServices _assetRequestService;
 
-        public AssetRequestController(IAssetRequestRepository assetRequestRepository)
+        public AssetRequestController(IAssetRequestServices assetRequestService)
         {
-            _assetRequestRepository = assetRequestRepository;
+            _assetRequestService = assetRequestService;
         }
 
-        [HttpGet]
-        [Route("GetAssetRequest")]
+        [HttpGet("GetAssetRequest")]
         public async Task<IActionResult> GetAllAssetRequests()
         {
             try
             {
-                var assetRequests = await _assetRequestRepository.GetAllAssetRequestsAsync();
+                var assetRequests = await _assetRequestService.GetAllAssetRequestsAsync();
                 return Ok(assetRequests);
             }
             catch (Exception ex)
@@ -37,7 +36,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var assetRequest = await _assetRequestRepository.GetAssetRequestByIdAsync(id);
+                var assetRequest = await _assetRequestService.GetAssetRequestByIdAsync(id);
                 if (assetRequest == null)
                 {
                     return NotFound($"Asset request with ID {id} not found.");
@@ -50,9 +49,8 @@ namespace HexAsset.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("AddAssetRequest")]
         [Authorize(Roles = "Employee")]
-        [Route("AddAssetRequest")]
         public async Task<IActionResult> AddAssetRequest(AssetRequestDto assetRequestDto)
         {
             try
@@ -64,7 +62,7 @@ namespace HexAsset.Controllers
                     RequestStatus = assetRequestDto.RequestStatus,
                     RequestDate = assetRequestDto.RequestDate
                 };
-                var addedAssetRequest = await _assetRequestRepository.AddAssetRequestAsync(newAssetRequest);
+                var addedAssetRequest = await _assetRequestService.CreateAssetRequestAsync(newAssetRequest);
                 return Ok(addedAssetRequest);
             }
             catch (Exception ex)
@@ -85,7 +83,7 @@ namespace HexAsset.Controllers
                     RequestStatus = assetRequestDto.RequestStatus,
                     RequestDate = assetRequestDto.RequestDate
                 };
-                var result = await _assetRequestRepository.UpdateAssetRequestAsync(id, updatedAssetRequest);
+                var result = await _assetRequestService.UpdateAssetRequestAsync(id, updatedAssetRequest);
                 if (result == null)
                 {
                     return NotFound($"Asset request with ID {id} not found.");
@@ -98,13 +96,13 @@ namespace HexAsset.Controllers
             }
         }
 
-        [Authorize(Roles = "Employee")]
         [HttpDelete("DeleteAssetRequest/{id}")]
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> DeleteAssetRequestById(int id)
         {
             try
             {
-                var isDeleted = await _assetRequestRepository.DeleteAssetRequestAsync(id);
+                var isDeleted = await _assetRequestService.DeleteAssetRequestAsync(id);
                 if (!isDeleted)
                 {
                     return NotFound($"Asset request with ID {id} not found.");

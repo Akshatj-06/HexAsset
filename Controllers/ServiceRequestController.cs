@@ -1,6 +1,6 @@
 ﻿using HexAsset.Models;
 using HexAsset.Models.Dto;
-using HexAsset.Repositories;
+using HexAsset.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,11 +10,11 @@ namespace HexAsset.Controllers
     [ApiController]
     public class ServiceRequestController : ControllerBase
     {
-        private readonly IServiceRequestRepository serviceRequestRepository;
+        private readonly IServiceRequestService _serviceRequestService;
 
-        public ServiceRequestController(IServiceRequestRepository serviceRequestRepository)
+        public ServiceRequestController(IServiceRequestService serviceRequestService)
         {
-            this.serviceRequestRepository = serviceRequestRepository;
+            _serviceRequestService = serviceRequestService;
         }
 
         [HttpGet]
@@ -23,7 +23,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var serviceRequests = await serviceRequestRepository.GetAllServiceRequestsAsync();
+                var serviceRequests = await _serviceRequestService.GetAllServiceRequestsAsync();
                 return Ok(serviceRequests);
             }
             catch (Exception ex)
@@ -37,7 +37,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var serviceRequest = await serviceRequestRepository.GetServiceRequestByIdAsync(id);
+                var serviceRequest = await _serviceRequestService.GetServiceRequestByIdAsync(id);
                 if (serviceRequest == null)
                 {
                     return NotFound($"Service request with ID {id} not found.");
@@ -65,7 +65,7 @@ namespace HexAsset.Controllers
                     RequestDate = serviceRequestDto.RequestDate
                 };
 
-                var createdRequest = await serviceRequestRepository.AddServiceRequestAsync(newServiceRequest);
+                var createdRequest = await _serviceRequestService.CreateServiceRequestAsync(newServiceRequest);
                 return Ok(createdRequest);
             }
             catch (Exception ex)
@@ -80,7 +80,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var updatedRequest = await serviceRequestRepository.UpdateServiceRequestAsync(id, new ServiceRequest
+                var updatedRequest = await _serviceRequestService.UpdateServiceRequestAsync(id, new ServiceRequest
                 {
                     AssetId = serviceRequestDto.AssetId,
                     UserId = serviceRequestDto.UserId,
@@ -108,7 +108,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var result = await serviceRequestRepository.DeleteServiceRequestAsync(id);
+                var result = await _serviceRequestService.DeleteServiceRequestAsync(id);
                 if (!result)
                 {
                     return NotFound($"Service request with ID {id} not found.");

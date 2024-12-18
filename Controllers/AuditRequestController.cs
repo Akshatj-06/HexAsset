@@ -1,5 +1,5 @@
 ﻿using HexAsset.Models.Dto;
-using HexAsset.Repositories;
+using HexAsset.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -10,11 +10,11 @@ namespace HexAsset.Controllers
     [ApiController]
     public class AuditRequestController : ControllerBase
     {
-        private readonly IAuditRequestRepository _auditRequestRepository;
+        private readonly IAuditRequestService _auditRequestService;
 
-        public AuditRequestController(IAuditRequestRepository auditRequestRepository)
+        public AuditRequestController(IAuditRequestService auditRequestService)
         {
-            _auditRequestRepository = auditRequestRepository;
+            _auditRequestService = auditRequestService;
         }
 
         [HttpGet]
@@ -23,7 +23,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var auditRequests = await _auditRequestRepository.GetAllAsync();
+                var auditRequests = await _auditRequestService.GetAllAuditRequestsAsync();
                 return Ok(auditRequests);
             }
             catch (Exception ex)
@@ -37,7 +37,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var auditRequest = await _auditRequestRepository.GetByIdAsync(id);
+                var auditRequest = await _auditRequestService.GetAuditRequestByIdAsync(id);
                 if (auditRequest == null)
                 {
                     return NotFound($"Audit request with ID {id} not found.");
@@ -58,7 +58,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var newAuditRequest = await _auditRequestRepository.AddAsync(auditRequestDto);
+                var newAuditRequest = await _auditRequestService.CreateAuditRequestAsync(auditRequestDto);
                 return Ok(newAuditRequest);
             }
             catch (Exception ex)
@@ -73,7 +73,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var updatedAuditRequest = await _auditRequestRepository.UpdateAsync(id, auditRequestDto);
+                var updatedAuditRequest = await _auditRequestService.UpdateAuditRequestAsync(id, auditRequestDto);
                 if (updatedAuditRequest == null)
                 {
                     return NotFound($"Audit request with ID {id} not found.");
@@ -93,7 +93,7 @@ namespace HexAsset.Controllers
         {
             try
             {
-                var isDeleted = await _auditRequestRepository.DeleteAsync(id);
+                var isDeleted = await _auditRequestService.DeleteAuditRequestAsync(id);
                 if (!isDeleted)
                 {
                     return NotFound($"Audit request with ID {id} not found.");
